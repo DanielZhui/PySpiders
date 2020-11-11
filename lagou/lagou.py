@@ -67,7 +67,7 @@ def get_page_data(position, key_world, total_size, page_size):
     print('>>>数据获取成功')
 
 if __name__ == "__main__":
-    position = input('请输入你要搜索职位的城市：')
-    kb = input('请输入你要搜索的职位：')
+    position = input('>>>请输入你要搜索职位的城市：').strip()
+    kb = input('>>>请输入你要搜索的职位：').strip()
     total_size, page_size = get_page_info(position, kb)
     get_page_data(position, kb, total_size, page_size)
