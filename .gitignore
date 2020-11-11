@@ -143,3 +143,5 @@ data/tmysql/data
 data/mysql/data
 data/pmysql/data
 data/tmysql/data
+
+*.txt
