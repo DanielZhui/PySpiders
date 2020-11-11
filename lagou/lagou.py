@@ -3,14 +3,6 @@ import json
 import urllib
 import requests
 
-# url = r"https://www.lagou.com/jobs/positionAjax.json?px=default&city=%E6%B7%B1%E5%9C%B3&needAddtionalResult=false"
-# headers = {
-#     "Accept": "application/json, text/javascript, */*; q=0.01",
-#     "Referer": r"https://www.lagou.com/jobs/list_%E5%B9%B3%E9%9D%A2%E8%AE%BE%E8%AE%A1/p-city_215?px=default#filterBox",
-#     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-#                   "(KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36",
-# }
-
 
 def get_request_params(position, city=215):
     req_url = 'https://www.lagou.com/jobs/list_{}/p-city_{}?&cl=false&fromSearch=true&labelWords=&suginput='.format(urllib.parse.quote(position), city)
@@ -26,12 +18,11 @@ def get_request_params(position, city=215):
 def get_params(pn, kd):
     return {
         'first': 'true',
-        'pn': pn + 1,
+        'pn': pn,
         'kd': kd
     }
 
 def get_cookie(position):
-    # url = r'https://www.lagou.com/jobs/list_%E5%B9%B3%E9%9D%A2%E8%AE%BE%E8%AE%A1/p-city_215?px=default#filterBox'
     req_url, _, headers = get_request_params(position)
     s = requests.session()
     s.get(req_url, headers=headers, timeout=3)
@@ -39,7 +30,7 @@ def get_cookie(position):
     return cookie
 
 def get_page_info(position, key_world):
-    params = get_params(0, key_world)
+    params = get_params(1, key_world)
     _, ajax_url, headers = get_request_params(position)
     html = requests.post(ajax_url, data=params, headers=headers, cookies=get_cookie(position), timeout=5)
     result = json.loads(html.text)
@@ -59,14 +50,13 @@ def get_page_data(position, key_world, total_size, page_size):
     path = os.path.join(path, 'lagou.txt')
     f = open(path, mode='w+')
     _, ajax_url, headers = get_request_params(position)
-    for i in range(total_size):
-        print('>>>开始获取第{}页数据'.format(i+1))
+    for i in range(1, total_size):
+        print('>>>开始获取第{}页数据'.format(i))
         params = get_params(i, key_world)
         html = requests.post(ajax_url, data=params, headers=headers, cookies=get_cookie(position), timeout=5)
         result = json.loads(html.text)
         data = result.get('content').get('positionResult').get('result')
         for i in range(page_size):
-            print(len(data), i)
             company_name = data[i].get('companyFullName')
             company_size = data[i].get('companySize')
             company_label = data[i].get('companyLabelList')
