@@ -4,6 +4,10 @@ import urllib
 import requests
 
 
+def validate_params(position, key_world):
+    if not position or not key_world:
+        raise Exception('输入参数不能为空')
+
 def get_request_params(position, city=215):
     req_url = 'https://www.lagou.com/jobs/list_{}/p-city_{}?&cl=false&fromSearch=true&labelWords=&suginput='.format(urllib.parse.quote(position), city)
     ajax_url = 'https://www.lagou.com/jobs/positionAjax.json?px=default&city={}&needAddtionalResult=false'.format(urllib.parse.quote('深圳'))
@@ -42,10 +46,10 @@ def get_page_info(position, key_world):
         total_size = total_size
     else:
         total_size = total_size + 1
-    print(total_size)
-    return total_size, page_size
+    print('>>>该职位总计{}条数据'.format(total_size))
+    return total_size
 
-def get_page_data(position, key_world, total_size, page_size):
+def get_page_data(position, key_world, total_size):
     path = os.path.dirname(__file__)
     path = os.path.join(path, 'lagou.txt')
     f = open(path, mode='w+')
@@ -56,6 +60,7 @@ def get_page_data(position, key_world, total_size, page_size):
         html = requests.post(ajax_url, data=params, headers=headers, cookies=get_cookie(position), timeout=5)
         result = json.loads(html.text)
         data = result.get('content').get('positionResult').get('result')
+        page_size = result.get('content').get('pageSize')
         for i in range(page_size):
             company_name = data[i].get('companyFullName')
             company_size = data[i].get('companySize')
@@ -64,10 +69,11 @@ def get_page_data(position, key_world, total_size, page_size):
             education = data[i].get('education')
             result_str = '{}&&{}&&{}&&{}&&{}\n'.format(company_name, company_size, company_label, salary, education)
             f.write(result_str)
-    print('>>>数据获取成功')
+    print('>>>数据获取完成')
 
 if __name__ == "__main__":
     position = input('>>>请输入你要搜索职位的城市：').strip()
     kb = input('>>>请输入你要搜索的职位：').strip()
-    total_size, page_size = get_page_info(position, kb)
-    get_page_data(position, kb, total_size, page_size)
+    validate_params(position, kb)
+    total_size = get_page_info(position, kb)
+    get_page_data(position, kb, total_size)
