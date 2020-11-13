@@ -2,6 +2,7 @@ import os
 import json
 import urllib
 import requests
+from cityNumMap import city_num_map
 
 
 def validate_params(position, key_world):
