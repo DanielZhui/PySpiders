@@ -5,16 +5,22 @@ import requests
 from cityNumMap import city_num_map
 
 
-def validate_params(position, key_world):
-    if not position or not key_world:
+def validate_params(city, key_world):
+    if not city or not key_world:
         raise Exception('输入参数不能为空')
 
-def get_request_params(position, city=215):
-    req_url = 'https://www.lagou.com/jobs/list_{}/p-city_{}?&cl=false&fromSearch=true&labelWords=&suginput='.format(urllib.parse.quote(position), city)
-    ajax_url = 'https://www.lagou.com/jobs/positionAjax.json?px=default&city={}&needAddtionalResult=false'.format(urllib.parse.quote('深圳'))
+def get_city_num_by_name(city_name):
+    city_num = city_num_map.get(city_name)
+    if not city_name:
+        raise BaseException('>>>你输入的城市名有误，请确认后在重新输入')
+    return city_num
+
+def get_request_params(city, city_num):
+    req_url = 'https://www.lagou.com/jobs/list_{}/p-city_{}?&cl=false&fromSearch=true&labelWords=&suginput='.format(urllib.parse.quote(city), city_num)
+    ajax_url = 'https://www.lagou.com/jobs/positionAjax.json?px=default&city={}&needAddtionalResult=false'.format(urllib.parse.quote(city))
     headers = headers = {
         "Accept": "application/json, text/javascript, */*; q=0.01",
-        "Referer": "https://www.lagou.com/jobs/list_{}/p-city_{}?px=default#filterBox".format(urllib.parse.quote(position), city),
+        "Referer": "https://www.lagou.com/jobs/list_{}/p-city_{}?px=default#filterBox".format(urllib.parse.quote(city), city_num),
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                     "(KHTML, like Gecko) Chrome/79.0.3945.130 Safari/537.36",
     }
@@ -27,17 +33,19 @@ def get_params(pn, kd):
         'kd': kd
     }
 
-def get_cookie(position):
-    req_url, _, headers = get_request_params(position)
+def get_cookie(city):
+    city_num = get_city_num_by_name(city)
+    req_url, _, headers = get_request_params(city, city_num)
     s = requests.session()
     s.get(req_url, headers=headers, timeout=3)
     cookie = s.cookies
     return cookie
 
-def get_page_info(position, key_world):
+def get_page_info(city, key_world):
     params = get_params(1, key_world)
-    _, ajax_url, headers = get_request_params(position)
-    html = requests.post(ajax_url, data=params, headers=headers, cookies=get_cookie(position), timeout=5)
+    city_num = get_city_num_by_name(city)
+    _, ajax_url, headers = get_request_params(city, city_num)
+    html = requests.post(ajax_url, data=params, headers=headers, cookies=get_cookie(city), timeout=5)
     result = json.loads(html.text)
     total_count = result.get('content').get('positionResult').get('totalCount')
     page_size = result.get('content').get('pageSize')
@@ -50,15 +58,16 @@ def get_page_info(position, key_world):
     print('>>>该职位总计{}条数据'.format(total_size))
     return total_size
 
-def get_page_data(position, key_world, total_size):
+def get_page_data(city, key_world, total_size):
     path = os.path.dirname(__file__)
     path = os.path.join(path, 'lagou.txt')
     f = open(path, mode='w+')
-    _, ajax_url, headers = get_request_params(position)
+    city_num = get_city_num_by_name(city)
+    _, ajax_url, headers = get_request_params(city, city_num)
     for i in range(1, total_size):
         print('>>>开始获取第{}页数据'.format(i))
         params = get_params(i, key_world)
-        html = requests.post(ajax_url, data=params, headers=headers, cookies=get_cookie(position), timeout=5)
+        html = requests.post(ajax_url, data=params, headers=headers, cookies=get_cookie(city), timeout=5)
         result = json.loads(html.text)
         data = result.get('content').get('positionResult').get('result')
         page_size = result.get('content').get('pageSize')
@@ -73,8 +82,8 @@ def get_page_data(position, key_world, total_size):
     print('>>>数据获取完成')
 
 if __name__ == "__main__":
-    position = input('>>>请输入你要搜索职位的城市：').strip()
+    city = input('>>>请输入你要搜索职位的城市：').strip()
     kb = input('>>>请输入你要搜索的职位：').strip()
-    validate_params(position, kb)
-    total_size = get_page_info(position, kb)
-    get_page_data(position, kb, total_size)
+    validate_params(city, kb)
+    total_size = get_page_info(city, kb)
+    get_page_data(city, kb, total_size)
