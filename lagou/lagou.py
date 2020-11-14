@@ -6,22 +6,53 @@ from cityNumMap import city_num_map
 
 
 def validate_city(city):
+    """校验输入的城市参数
+
+    Args:
+        city (string): 查找职位的城市
+
+    Raises:
+        BaseException: 如果没找到对应的城市值
+    """
     if city_num_map.get(city) == 0:
         return
     if city and not city_num_map.get(city):
         raise BaseException('未找到对应城市的信息，请确认后在次输入')
 
 def validate_key_world(key_world):
+    """校验职位参数
+
+    Args:
+        key_world (string): 职位
+
+    Raises:
+        BaseException: 输入参数为空
+    """
     if not key_world:
-        raise Exception('输入参数不能为空')
+        raise BaseException('输入参数不能为空')
 
 def get_city_num_by_name(city_name):
+    """城市名
+
+    Args:
+        city_name (string): 城市名
+
+    Returns:
+        string: 城市名称对应的值
+    """
     city_num = city_num_map.get(city_name)
-    if not city_name:
-        raise BaseException('>>>你输入的城市名有误，请确认后在重新输入')
     return city_num
 
 def get_request_params(city, city_num):
+    """获取请求参数
+
+    Args:
+        city (string): 城市名
+        city_num (number): 城市名称对应的值
+
+    Returns:
+        string, string, dict: req_url, ajax_url, headers
+    """
     req_url = 'https://www.lagou.com/jobs/list_{}/p-city_{}?&cl=false&fromSearch=true&labelWords=&suginput='.format(urllib.parse.quote(city), city_num)
     ajax_url = 'https://www.lagou.com/jobs/positionAjax.json?px=default&city={}&needAddtionalResult=false'.format(urllib.parse.quote(city))
     headers = headers = {
@@ -33,6 +64,19 @@ def get_request_params(city, city_num):
     return req_url, ajax_url, headers
 
 def get_params(pn, kd):
+    """获取请求参数
+
+    Args:
+        pn (number): 页码
+        kd (string): 职位
+
+    Returns:
+        dict: {
+        'first': 'true',
+        'pn': pn,
+        'kd': kd
+    }
+    """
     return {
         'first': 'true',
         'pn': pn,
@@ -40,6 +84,14 @@ def get_params(pn, kd):
     }
 
 def get_cookie(city):
+    """获取请求 cookie
+
+    Args:
+        city (string): 城市名称
+
+    Returns:
+        string: cookie
+    """
     city_num = get_city_num_by_name(city)
     req_url, _, headers = get_request_params(city, city_num)
     s = requests.session()
@@ -48,6 +100,15 @@ def get_cookie(city):
     return cookie
 
 def get_page_info(city, key_world):
+    """获取分页信息
+
+    Args:
+        city (string): 城市
+        key_world (string): 职位
+
+    Returns:
+        number: 总页码
+    """
     params = get_params(1, key_world)
     city_num = get_city_num_by_name(city)
     _, ajax_url, headers = get_request_params(city, city_num)
@@ -65,6 +126,13 @@ def get_page_info(city, key_world):
     return total_size
 
 def get_page_data(city, key_world, total_size):
+    """获取搜索数据
+
+    Args:
+        city (string): 城市
+        key_world (string): 职位
+        total_size (number): 总页码
+    """
     path = os.path.dirname(__file__)
     path = os.path.join(path, 'lagou.txt')
     f = open(path, mode='w+')
