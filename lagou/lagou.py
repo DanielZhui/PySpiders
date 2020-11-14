@@ -5,8 +5,14 @@ import requests
 from cityNumMap import city_num_map
 
 
-def validate_params(city, key_world):
-    if not city or not key_world:
+def validate_city(city):
+    if city_num_map.get(city) == 0:
+        return
+    if city and not city_num_map.get(city):
+        raise BaseException('未找到对应城市的信息，请确认后在次输入')
+
+def validate_key_world(key_world):
+    if not key_world:
         raise Exception('输入参数不能为空')
 
 def get_city_num_by_name(city_name):
@@ -82,8 +88,10 @@ def get_page_data(city, key_world, total_size):
     print('>>>数据获取完成')
 
 if __name__ == "__main__":
-    city = input('>>>请输入你要搜索职位的城市：').strip()
+    # 如果没有输入城市信息则默认为全国
+    city = input('>>>请输入你要搜索职位的城市：').strip() or "全国"
+    validate_city(city)
     kb = input('>>>请输入你要搜索的职位：').strip()
-    validate_params(city, kb)
+    validate_key_world(kb)
     total_size = get_page_info(city, kb)
     get_page_data(city, kb, total_size)
