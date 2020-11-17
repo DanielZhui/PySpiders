@@ -13,6 +13,7 @@ class GetIpProxyPool(object):
 
     def __init__(self, url):
         self.url = url
+        self.get_proxy_data()
 
     def get_proxy_data(self):
         result = requests.get(self.url).text
@@ -48,5 +49,4 @@ class GetIpProxyPool(object):
 
 if __name__ == "__main__":
     proxy_pool = GetIpProxyPool(url)
-    proxy_pool.get_proxy_data()
     proxy_pool.validate_proxy()
