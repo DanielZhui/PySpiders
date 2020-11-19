@@ -9,7 +9,7 @@ url = 'https://raw.githubusercontent.com/fate0/proxylist/master/proxy.list'
 
 class GetIpProxyPool(object):
 
-    ping_url = 'https://www.baidu.com'
+    ping_url = 'https://blog.csdn.net/DanielJackZ/article/details/106870071'
 
     def __init__(self, url):
         self.url = url
