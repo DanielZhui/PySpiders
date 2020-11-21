@@ -17,7 +17,7 @@ def brush_visits(data):
     f = open(os.path.join(os.path.dirname(__file__), 'useful.txt'))
     for line in f.readlines():
         line = json.loads(line)
-        proxy_ip = {line.get('type'): line.get('host')}
+        proxy_ip = {line.get('type'): '{}:{}'.format(line.get('host'), line.get('port'))}
         print('>>>', proxy_ip)
         proxy_support = request.ProxyHandler(proxy_ip)
         opener = request.build_opener(proxy_support)
