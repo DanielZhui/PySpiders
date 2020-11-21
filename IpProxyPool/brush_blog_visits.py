@@ -14,11 +14,11 @@ def get_blog_list(blog_list_url):
     return data
 
 def brush_visits(data):
-    f = open(os.path.join(os.path.dirname(__file__), 'useful.txt'), 'rb')
+    f = open(os.path.join(os.path.dirname(__file__), 'useful.txt'))
     for line in f.readlines():
-        print(line)
-        line = json.loads(line.decode('utf8'))
+        line = json.loads(line)
         proxy_ip = {line.get('type'): line.get('host')}
+        print('>>>', proxy_ip)
         proxy_support = request.ProxyHandler(proxy_ip)
         opener = request.build_opener(proxy_support)
         opener.addheaders = [('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36')]
