@@ -1,6 +1,5 @@
 import os
 import json
-import asyncio
 import requests
 import time
 from settings import *
@@ -22,7 +21,7 @@ class VerifyIp(object):
             port = line.get('port')
             real_ip = '{}://{}:{}'.format(protocol_type, host, port)
             print('正在测试ip：', real_ip)
-            with requests.get(TEST_URL, headers=self.headers, proxies={protocol_type: real_ip}, timeout=10,) as response:
+            with requests.get(TEST_URL, headers=self.headers, proxies={protocol_type: real_ip}, timeout=10) as response:
                 if response.status_code not in SUCCESS_CODES:
                     print('>>>{}无效ip'.format(real_ip))
                 else:
