@@ -1,0 +1,9 @@
+root = true
+
+[*]
+charset = utf-8                           # 文件编码
+indent_style = space                      # 缩进格式
+indent_size = 4
+end_of_line = lf                          # 换行符格式
+insert_final_newline = true               # 在文件的最后插入一个空行
+trim_trailing_whitespace = true           # 删除行尾的空格
