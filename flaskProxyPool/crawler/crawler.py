@@ -5,8 +5,6 @@ import requests
 import urllib
 from lxml import etree
 
-
-url = 'https://raw.githubusercontent.com/fate0/proxylist/master/proxy.list'
 TEST_URL = 'https://www.baidu.com'
 SUCCESS_CODES = [200, 302]
 
@@ -18,6 +16,7 @@ class GetIpProxyPool(object):
     }
     file_path = os.path.join(os.path.dirname(__file__), 'res.txt')
     def __init__(self, url):
+        self.ip_list = []
         self.url = url
         self.get_proxy_data()
         self.f = open(self.file_path)
@@ -47,12 +46,16 @@ class GetIpProxyPool(object):
             try:
                 with requests.get(TEST_URL, headers=self.headers, proxies={protocol_type: real_ip}, timeout=10) as response:
                     if response.status_code not in SUCCESS_CODES:
-                        print('>>>{}无效ip'.format(real_ip))
+                        print('failed>>>{}无效ip'.format(real_ip))
                     else:
                         print('success>>>{} ip有效'.format(real_ip))
+                        ip_dict = {
+                            'protocol_type':  protocol_type,
+                            'host': host,
+                            'port': port
+                        }
+                        self.ip_list.append(ip_dict)
             except Exception as e:
-                print(e)
-
-if __name__ == "__main__":
-    proxy_pool = GetIpProxyPool(url)
-    proxy_pool.validate_ip()
+                print('failed>>>{}ip超时\n'.format(real_ip), e)
+        print('ip_list>>>', self.ip_list)
+        return self.ip_list
